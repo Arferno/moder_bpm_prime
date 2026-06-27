@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, field_validator
+from pydantic import Field
 from typing import List
 
 
@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     bot_token: str = Field(..., alias="BOT_TOKEN")
     database_url: str = Field(..., alias="DATABASE_URL")
-    admin_ids: List[int] = Field(default_factory=list, alias="ADMIN_IDS")
+    admin_ids_str: str = Field(default="", alias="ADMIN_IDS")
     super_admin_id: int = Field(..., alias="SUPER_ADMIN_ID")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
 
@@ -25,15 +25,11 @@ class Settings(BaseSettings):
     # Blacklist cache TTL in seconds
     blacklist_cache_ttl: int = Field(default=300, alias="BLACKLIST_CACHE_TTL")
 
-    @field_validator("admin_ids", mode="before")
-    @classmethod
-    def parse_admin_ids(cls, v):
-        if isinstance(v, str):
-            # Handle comma-separated string: "1,2,3" -> [1, 2, 3]
-            return [int(x.strip()) for x in v.split(",") if x.strip()]
-        if isinstance(v, list):
-            return v
-        return []
+    @property
+    def admin_ids(self) -> List[int]:
+        if not self.admin_ids_str:
+            return []
+        return [int(x.strip()) for x in self.admin_ids_str.split(",") if x.strip()]
 
 
 settings = Settings()
