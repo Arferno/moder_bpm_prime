@@ -13,7 +13,7 @@ from bot.utils.helpers import get_level_progress
 router = Router(name="profile")
 
 
-@router.message(Command("profile"), GroupFilter())
+@router.message(Command("profile"), GroupFilter)
 async def cmd_profile(message: Message, session: AsyncSession):
     """Show user profile."""
     user = await get_user_by_id(session, message.from_user.id)
@@ -24,7 +24,7 @@ async def cmd_profile(message: Message, session: AsyncSession):
     await message.reply(format_profile(user), parse_mode="HTML")
 
 
-@router.message(Command("balance"), GroupFilter())
+@router.message(Command("balance"), GroupFilter)
 async def cmd_balance(message: Message, session: AsyncSession):
     """Show user balance."""
     user = await get_user_by_id(session, message.from_user.id)
@@ -35,7 +35,7 @@ async def cmd_balance(message: Message, session: AsyncSession):
     await message.reply(f"💰 <b>Баланс: {format_money(user.balance)}</b> $", parse_mode="HTML")
 
 
-@router.message(Command("top"), GroupFilter())
+@router.message(Command("top"), GroupFilter)
 async def cmd_top(message: Message, session: AsyncSession, command: CommandObject):
     """Show leaderboards: /top [money|level|clan]"""
     args = command.args.split() if command.args else []
@@ -68,7 +68,7 @@ async def cmd_top(message: Message, session: AsyncSession, command: CommandObjec
     await message.reply(text, parse_mode="HTML")
 
 
-@router.message(Command("mystats"), GroupFilter())
+@router.message(Command("mystats"), GroupFilter)
 async def cmd_mystats(message: Message, session: AsyncSession):
     """Show detailed stats for user."""
     user = await get_user_by_id(session, message.from_user.id)

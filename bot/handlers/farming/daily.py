@@ -14,7 +14,7 @@ from bot.filters.chat_type import GroupFilter
 router = Router(name="daily")
 
 
-@router.message(Command("daily"), GroupFilter())
+@router.message(Command("daily"), GroupFilter)
 async def cmd_daily(message: Message, session: AsyncSession):
     """Daily reward command."""
     user = await get_user_by_id(session, message.from_user.id)
@@ -55,7 +55,7 @@ async def cmd_daily(message: Message, session: AsyncSession):
     await message.reply(text, parse_mode="HTML")
 
 
-@router.message(Command("streak"), GroupFilter())
+@router.message(Command("streak"), GroupFilter)
 async def cmd_streak(message: Message, session: AsyncSession):
     """Show current streak."""
     user = await get_user_by_id(session, message.from_user.id)

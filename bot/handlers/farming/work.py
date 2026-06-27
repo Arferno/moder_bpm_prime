@@ -14,7 +14,7 @@ from bot.filters.chat_type import GroupFilter
 router = Router(name="work")
 
 
-@router.message(Command("work"), GroupFilter())
+@router.message(Command("work"), GroupFilter)
 async def cmd_work(message: Message, session: AsyncSession):
     """Show available jobs."""
     user = await get_user_by_id(session, message.from_user.id)
@@ -76,7 +76,7 @@ async def cb_work_cancel(callback: CallbackQuery):
     await callback.answer()
 
 
-@router.message(Command("jobinfo"), GroupFilter())
+@router.message(Command("jobinfo"), GroupFilter)
 async def cmd_jobinfo(message: Message, session: AsyncSession, command: CommandObject):
     """Show job info: /jobinfo <job_id>"""
     if not command.args or not command.args.isdigit():

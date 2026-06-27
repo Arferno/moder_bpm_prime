@@ -24,7 +24,7 @@ router = Router(name="shop")
 SHOP_CATEGORIES = ["all", "boost", "protection", "consumable", "clan", "special"]
 
 
-@router.message(Command("shop"), GroupFilter())
+@router.message(Command("shop"), GroupFilter)
 async def cmd_shop(message: Message, session: AsyncSession, command: CommandObject):
     """Show shop."""
     user = await get_user_by_id(session, message.from_user.id)
@@ -246,7 +246,7 @@ async def cb_shop_close(callback: CallbackQuery):
     await callback.answer()
 
 
-@router.message(Command("inventory"), GroupFilter())
+@router.message(Command("inventory"), GroupFilter)
 async def cmd_inventory(message: Message, session: AsyncSession):
     """Show inventory directly."""
     user = await get_user_by_id(session, message.from_user.id)
@@ -263,7 +263,7 @@ async def cmd_inventory(message: Message, session: AsyncSession):
     await message.reply(text, reply_markup=inventory_keyboard(inventory), parse_mode="HTML")
 
 
-@router.message(Command("buy"), GroupFilter())
+@router.message(Command("buy"), GroupFilter)
 async def cmd_buy(message: Message, session: AsyncSession, command: CommandObject):
     """Buy item directly: /buy <item_id> [count]"""
     user = await get_user_by_id(session, message.from_user.id)

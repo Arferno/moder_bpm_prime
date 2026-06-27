@@ -25,7 +25,7 @@ from bot.filters.chat_type import GroupFilter
 router = Router(name="clan")
 
 
-@router.message(Command("clan"), GroupFilter())
+@router.message(Command("clan"), GroupFilter)
 async def cmd_clan(message: Message, session: AsyncSession, command: CommandObject):
     """Clan main command."""
     user = await get_user_by_id(session, message.from_user.id)

@@ -14,7 +14,7 @@ from bot.filters.chat_type import GroupFilter
 router = Router(name="crime")
 
 
-@router.message(Command("crime"), GroupFilter())
+@router.message(Command("crime"), GroupFilter)
 async def cmd_crime(message: Message, session: AsyncSession):
     """Show available crimes."""
     user = await get_user_by_id(session, message.from_user.id)
@@ -83,7 +83,7 @@ async def cb_crime_cancel(callback: CallbackQuery):
     await callback.answer()
 
 
-@router.message(Command("crimeinfo"), GroupFilter())
+@router.message(Command("crimeinfo"), GroupFilter)
 async def cmd_crimeinfo(message: Message, session: AsyncSession, command: CommandObject):
     """Show crime info: /crimeinfo <crime_id>"""
     if not command.args or not command.args.isdigit():

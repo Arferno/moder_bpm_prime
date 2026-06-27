@@ -23,7 +23,7 @@ from bot.filters.chat_type import GroupFilter
 router = Router(name="business")
 
 
-@router.message(Command("business"), GroupFilter())
+@router.message(Command("business"), GroupFilter)
 async def cmd_business(message: Message, session: AsyncSession):
     """Show business menu."""
     user = await get_user_by_id(session, message.from_user.id)
@@ -134,7 +134,7 @@ async def cb_business_close(callback: CallbackQuery):
     await callback.answer()
 
 
-@router.message(Command("businessinfo"), GroupFilter())
+@router.message(Command("businessinfo"), GroupFilter)
 async def cmd_businessinfo(message: Message, session: AsyncSession, command: CommandObject):
     """Show business info: /businessinfo <id>"""
     if not command.args or not command.args.isdigit():

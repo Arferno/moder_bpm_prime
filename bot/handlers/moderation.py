@@ -69,7 +69,7 @@ async def get_target_user(message: Message, session: AsyncSession) -> tuple[User
 
 # ==================== BAN ====================
 
-@router.message(Command("ban"), GroupFilter(), IsAdminFilter())
+@router.message(Command("ban"), GroupFilter, IsAdminFilter())
 async def cmd_ban(message: Message, session: AsyncSession, bot: Bot, command: CommandObject):
     """Ban user: /ban @user [time] [reason]"""
     user, target_tg_id = await get_target_user(message, session)
@@ -101,7 +101,7 @@ async def cmd_ban(message: Message, session: AsyncSession, bot: Bot, command: Co
         await message.reply("❌ Ошибка при бане")
 
 
-@router.message(Command("unban"), GroupFilter(), IsAdminFilter())
+@router.message(Command("unban"), GroupFilter, IsAdminFilter())
 async def cmd_unban(message: Message, session: AsyncSession, bot: Bot):
     """Unban user: /unban @user"""
     user, target_tg_id = await get_target_user(message, session)
@@ -118,7 +118,7 @@ async def cmd_unban(message: Message, session: AsyncSession, bot: Bot):
 
 # ==================== MUTE ====================
 
-@router.message(Command("mute"), GroupFilter(), IsAdminFilter())
+@router.message(Command("mute"), GroupFilter, IsAdminFilter())
 async def cmd_mute(message: Message, session: AsyncSession, bot: Bot, command: CommandObject):
     """Mute user: /mute @user <time> [reason]"""
     user, target_tg_id = await get_target_user(message, session)
@@ -149,7 +149,7 @@ async def cmd_mute(message: Message, session: AsyncSession, bot: Bot, command: C
         await message.reply("❌ Ошибка при муте")
 
 
-@router.message(Command("unmute"), GroupFilter(), IsAdminFilter())
+@router.message(Command("unmute"), GroupFilter, IsAdminFilter())
 async def cmd_unmute(message: Message, session: AsyncSession, bot: Bot):
     """Unmute user: /unmute @user"""
     user, target_tg_id = await get_target_user(message, session)
@@ -166,7 +166,7 @@ async def cmd_unmute(message: Message, session: AsyncSession, bot: Bot):
 
 # ==================== WARN ====================
 
-@router.message(Command("warn"), GroupFilter(), IsAdminFilter())
+@router.message(Command("warn"), GroupFilter, IsAdminFilter())
 async def cmd_warn(message: Message, session: AsyncSession, bot: Bot, command: CommandObject):
     """Warn user: /warn @user [reason]"""
     user, target_tg_id = await get_target_user(message, session)
@@ -187,7 +187,7 @@ async def cmd_warn(message: Message, session: AsyncSession, bot: Bot, command: C
         await message.reply("❌ Ошибка при выдаче варна")
 
 
-@router.message(Command("unwarn"), GroupFilter(), IsAdminFilter())
+@router.message(Command("unwarn"), GroupFilter, IsAdminFilter())
 async def cmd_unwarn(message: Message, session: AsyncSession, bot: Bot):
     """Remove warn: /unwarn @user"""
     user, target_tg_id = await get_target_user(message, session)
@@ -204,7 +204,7 @@ async def cmd_unwarn(message: Message, session: AsyncSession, bot: Bot):
 
 # ==================== BLACKLIST ====================
 
-@router.message(Command("blacklist"), GroupFilter(), IsAdminFilter())
+@router.message(Command("blacklist"), GroupFilter, IsAdminFilter())
 async def cmd_blacklist(message: Message, session: AsyncSession, command: CommandObject):
     """Blacklist management: /blacklist add|del|list|toggle <word> [action] [time]"""
     args = command.args.split() if command.args else []
