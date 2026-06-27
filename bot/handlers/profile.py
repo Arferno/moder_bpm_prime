@@ -7,7 +7,7 @@ from bot.database.crud import get_user_by_id, get_top_users
 from bot.keyboards.inline import pagination_keyboard
 from bot.utils.formatting import format_profile, format_money, format_number
 from bot.filters.chat_type import GroupFilter
-from bot.utils.helpers import get_level_progress
+from bot.services.farming_service import get_level_progress
 
 
 router = Router(name="profile")
