@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from bot.database.models import User, ModerationLog, ModerationAction
-from bot.database.crud import get_user_by_id, get_all_blacklist_words
+from bot.database.crud import get_user_by_id, get_all_blacklist_words, invalidate_blacklist_cache
 from bot.services.moderation_service import (
     ban_user,
     unban_user,
@@ -20,7 +20,6 @@ from bot.filters.is_admin import IsSuperAdminFilter
 from bot.config import settings
 from bot.utils.formatting import format_money, format_number
 from bot.utils.helpers import get_mention
-from bot.utils.text import invalidate_blacklist_cache
 
 
 router = Router(name="admin")
