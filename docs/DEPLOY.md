@@ -91,7 +91,6 @@ BOT_TOKEN=8827733006:AAEru_XDRmizJ5x0IZC0ayHEIAqD7eEj98E
 DATABASE_URL=postgresql+asyncpg://postgres:PASSWORD@db.xxx.supabase.co:5432/postgres
 ADMIN_IDS=5459865698,6766857089,7079908197
 SUPER_ADMIN_ID=6766857089
-REDIS_URL=redis://redis:6379/0
 LOG_LEVEL=INFO
 ```
 
@@ -216,10 +215,6 @@ Push в `main` → автоматический деплой.
 - Проверь `DATABASE_URL` в `.env`
 - Убедись, что Supabase не на паузе (free tier засыпает через неделю неактивности)
 - Проверь Security List в Oracle VCN (порт 5432 не нужен, Supabase доступен по интернету)
-
-### Redis connection error
-- Убедись, что в docker-compose.prod.yml сервис `redis` запущен
-- Проверь `REDIS_URL=redis://redis:6379/0`
 
 ### Миграции не применяются
 ```bash
