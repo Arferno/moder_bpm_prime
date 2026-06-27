@@ -189,8 +189,6 @@ def inventory_keyboard(items: List[UserItem], page: int = 1, per_page: int = 5) 
             callback_data=f"inv_use:{ui.item.id}"
         )
 
-    )
-
     # Pagination
     total_pages = (len(items) + per_page - 1) // per_page
     if total_pages > 1:
