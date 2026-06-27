@@ -17,23 +17,91 @@ from bot.database.models import (
     Item,
     UserItem,
     UserRole,
+    ItemType,
     ModerationAction,
     BlacklistAction,
 )
 from bot.config import settings
-import redis.asyncio as redis
-import json
 
 
-# Redis client for caching
-_redis_client: Optional[redis.Redis] = None
+# In-memory cache for blacklist
+_blacklist_cache: List[BlacklistWord] = []
+_blacklist_cache_time: Optional[datetime] = None
 
 
-async def get_redis() -> redis.Redis:
-    global _redis_client
-    if _redis_client is None:
-        _redis_client = redis.from_url(settings.redis_url, decode_responses=True)
-    return _redis_client
+async def get_all_blacklist_words(session: AsyncSession) -> List[BlacklistWord]:
+    result = await session.execute(
+        select(BlacklistWord).where(BlacklistWord.is_active == True)
+    )
+    return result.scalars().all()
+
+
+async def get_cached_blacklist(session: AsyncSession) -> List[BlacklistWord]:
+    """Get blacklist words with in-memory caching (TTL from settings)."""
+    global _blacklist_cache, _blacklist_cache_time
+    
+    now = datetime.utcnow()
+    
+    # Check if cache is valid
+    if _blacklist_cache and _blacklist_cache_time:
+        if (now - _blacklist_cache_time).total_seconds() < settings.blacklist_cache_ttl:
+            return _blacklist_cache
+    
+    # Refresh cache
+    words = await get_all_blacklist_words(session)
+    _blacklist_cache = words
+    _blacklist_cache_time = now
+    return words
+
+
+async def invalidate_blacklist_cache() -> None:
+    """Invalidate in-memory blacklist cache."""
+    global _blacklist_cache, _blacklist_cache_time
+    _blacklist_cache = []
+    _blacklist_cache_time = None
+
+
+async def add_blacklist_word(
+    session: AsyncSession,
+    word: str,
+    normalized_word: str,
+    action: BlacklistAction,
+    duration_sec: int,
+    created_by: int,
+    regex_pattern: Optional[str] = None,
+) -> BlacklistWord:
+    bl_word = BlacklistWord(
+        word=word,
+        normalized_word=normalized_word,
+        regex_pattern=regex_pattern,
+        action=action,
+        duration_sec=duration_sec,
+        created_by=created_by,
+    )
+    session.add(bl_word)
+    await session.flush()
+    await invalidate_blacklist_cache()
+    return bl_word
+
+
+async def remove_blacklist_word(session: AsyncSession, word: str) -> bool:
+    result = await session.execute(
+        delete(BlacklistWord).where(BlacklistWord.word == word)
+    )
+    await invalidate_blacklist_cache()
+    return result.rowcount > 0
+
+
+async def toggle_blacklist_word(session: AsyncSession, word: str) -> Optional[BlacklistWord]:
+    result = await session.execute(
+        select(BlacklistWord).where(BlacklistWord.word == word)
+    )
+    bl_word = result.scalar_one_or_none()
+    if bl_word:
+        bl_word.is_active = not bl_word.is_active
+        await session.flush()
+        await invalidate_blacklist_cache()
+    return bl_word
 
 
 # ==================== USER CRUD ====================
@@ -153,90 +221,6 @@ async def get_top_users(session: AsyncSession, by: str = "balance", limit: int =
         .limit(limit)
     )
     return result.scalars().all()
-
-
-# ==================== BLACKLIST CRUD ====================
-
-async def get_all_blacklist_words(session: AsyncSession) -> List[BlacklistWord]:
-    result = await session.execute(
-        select(BlacklistWord).where(BlacklistWord.is_active == True)
-    )
-    return result.scalars().all()
-
-
-async def get_cached_blacklist(session: AsyncSession) -> List[BlacklistWord]:
-    r = await get_redis()
-    cached = await r.get("blacklist_words")
-    if cached:
-        data = json.loads(cached)
-        return [BlacklistWord(**item) for item in data]
-
-    words = await get_all_blacklist_words(session)
-    # Cache for TTL seconds
-    serializable = [
-        {
-            "id": w.id,
-            "word": w.word,
-            "normalized_word": w.normalized_word,
-            "regex_pattern": w.regex_pattern,
-            "action": w.action.value,
-            "duration_sec": w.duration_sec,
-            "is_active": w.is_active,
-            "created_by": w.created_by,
-            "created_at": w.created_at.isoformat() if w.created_at else None,
-        }
-        for w in words
-    ]
-    await r.setex("blacklist_words", settings.blacklist_cache_ttl, json.dumps(serializable, default=str))
-    return words
-
-
-async def invalidate_blacklist_cache() -> None:
-    r = await get_redis()
-    await r.delete("blacklist_words")
-
-
-async def add_blacklist_word(
-    session: AsyncSession,
-    word: str,
-    normalized_word: str,
-    action: BlacklistAction,
-    duration_sec: int,
-    created_by: int,
-    regex_pattern: Optional[str] = None,
-) -> BlacklistWord:
-    bl_word = BlacklistWord(
-        word=word,
-        normalized_word=normalized_word,
-        regex_pattern=regex_pattern,
-        action=action,
-        duration_sec=duration_sec,
-        created_by=created_by,
-    )
-    session.add(bl_word)
-    await session.flush()
-    await invalidate_blacklist_cache()
-    return bl_word
-
-
-async def remove_blacklist_word(session: AsyncSession, word: str) -> bool:
-    result = await session.execute(
-        delete(BlacklistWord).where(BlacklistWord.word == word)
-    )
-    await invalidate_blacklist_cache()
-    return result.rowcount > 0
-
-
-async def toggle_blacklist_word(session: AsyncSession, word: str) -> Optional[BlacklistWord]:
-    result = await session.execute(
-        select(BlacklistWord).where(BlacklistWord.word == word)
-    )
-    bl_word = result.scalar_one_or_none()
-    if bl_word:
-        bl_word.is_active = not bl_word.is_active
-        await session.flush()
-        await invalidate_blacklist_cache()
-    return bl_word
 
 
 # ==================== MODERATION LOGS ====================
