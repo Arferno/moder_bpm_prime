@@ -28,6 +28,7 @@ from bot.handlers import (
     profile,
     shop,
     admin,
+    text_commands,
 )
 from bot.handlers.farming import (
     daily,
@@ -100,6 +101,7 @@ async def lifespan():
     dp.include_router(profile.router)
     dp.include_router(shop.router)
     dp.include_router(admin.router)
+    dp.include_router(text_commands.router)
     print("=== ROUTERS REGISTERED ===", flush=True)
 
     # Delete webhook if exists (important for polling)
