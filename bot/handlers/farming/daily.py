@@ -4,14 +4,57 @@ from aiogram.filters import Command, CommandObject
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
 
-from bot.database.crud import get_user_by_id
+from bot.database.crud import get_user_by_id, get_or_create_user
 from bot.services.farming_service import process_daily_reward
 from bot.keyboards.inline import confirm_keyboard
 from bot.utils.formatting import format_money, format_time
-from bot.filters.chat_type import GroupFilter
+from bot.filters.chat_type import GroupFilter, PrivateFilter
 
 
 router = Router(name="daily")
+
+
+@router.message(Command("start"), GroupFilter)
+async def cmd_start(message: Message, session: AsyncSession):
+    """Start command - register user and show welcome."""
+    user = await get_or_create_user(session, message.from_user.id, message.from_user.username, message.from_user.full_name)
+    await message.reply(
+        "👋 <b>Привет! Я бот BPM PRIME.</b>\n\n"
+        "Доступные команды:\n"
+        "🎁 /daily — ежедневная награда\n"
+        "💼 /work — работа\n"
+        "🔫 /crime — преступления\n"
+        "🏢 /business — бизнесы\n"
+        "🏰 /clan — кланы\n"
+        "🛒 /shop — магазин\n"
+        "👤 /profile — профиль\n"
+        "💰 /balance — баланс\n"
+        "📊 /top — топ игроков\n\n"
+        "Напиши /help для подробностей.",
+        parse_mode="HTML"
+    )
+
+
+@router.message(Command("start"), PrivateFilter)
+async def cmd_start_private(message: Message, session: AsyncSession):
+    """Start command in private chat."""
+    user = await get_or_create_user(session, message.from_user.id, message.from_user.username, message.from_user.full_name)
+    from bot.keyboards.reply import main_menu_keyboard
+    await message.reply(
+        "👋 <b>Привет! Я бот BPM PRIME.</b>\n\n"
+        "Используй кнопки ниже или команды:\n"
+        "🎁 /daily — ежедневная награда\n"
+        "💼 /work — работа\n"
+        "🔫 /crime — преступления\n"
+        "🏢 /business — бизнесы\n"
+        "🏰 /clan — кланы\n"
+        "🛒 /shop — магазин\n"
+        "👤 /profile — профиль\n"
+        "💰 /balance — баланс\n"
+        "📊 /top — топ игроков",
+        reply_markup=main_menu_keyboard(),
+        parse_mode="HTML"
+    )
 
 
 @router.message(Command("daily"), GroupFilter)
