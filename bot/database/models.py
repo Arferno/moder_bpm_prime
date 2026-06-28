@@ -56,7 +56,7 @@ class ItemType(str, enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     tg_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True, nullable=False)
     username: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     full_name: Mapped[str] = mapped_column(String(128), nullable=False, default="")
@@ -118,8 +118,8 @@ class ModerationLog(Base):
     __tablename__ = "moderation_logs"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
-    admin_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=False, index=True)
+    admin_id: Mapped[Optional[int]] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=True)
     action: Mapped[ModerationAction] = mapped_column(SQLEnum(ModerationAction), nullable=False)
     reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     duration_sec: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
@@ -173,7 +173,7 @@ class UserBusiness(Base):
     __tablename__ = "user_businesses"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=False, index=True)
     business_id: Mapped[int] = mapped_column(ForeignKey("businesses.id"), nullable=False)
     level: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     bought_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
@@ -193,7 +193,7 @@ class Clan(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     tag: Mapped[str] = mapped_column(String(16), unique=True, nullable=False, index=True)
-    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    owner_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=False)
     level: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     exp: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     balance: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
@@ -208,7 +208,7 @@ class ClanMember(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     clan_id: Mapped[int] = mapped_column(ForeignKey("clans.id"), nullable=False, index=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=False, index=True)
     role: Mapped[UserRole] = mapped_column(SQLEnum(UserRole), default=UserRole.MEMBER, nullable=False)
     joined_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
@@ -236,7 +236,7 @@ class UserItem(Base):
     __tablename__ = "user_items"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=False, index=True)
     item_id: Mapped[int] = mapped_column(ForeignKey("items.id"), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     acquired_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
