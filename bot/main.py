@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import sys
+from contextlib import asynccontextmanager
 
 # IMMEDIATE STARTUP LOG - will show regardless of log level
 print("=== BOT STARTING ===", flush=True)
@@ -103,6 +104,7 @@ async def lifespan():
     print("=== WEBHOOK DELETED ===", flush=True)
 
     # Start scheduler for periodic tasks
+    print("=== STARTING SCHEDULER ===", flush=True)
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
         check_and_unmute_expired,
@@ -112,6 +114,7 @@ async def lifespan():
         id="check_unmute",
         replace_existing=True,
     )
+    scheduler.add_job(
         collect_business_income_job,
         "interval",
         hours=1,
@@ -128,21 +131,21 @@ async def lifespan():
         replace_existing=True,
     )
     scheduler.start()
-    logger.info("Scheduler started")
+    print("=== SCHEDULER STARTED ===", flush=True)
 
     # Log bot info
     me = await bot.get_me()
-    logger.info(f"Bot started: @{me.username} ({me.id})")
+    print(f"=== BOT STARTED: @{me.username} ({me.id}) ===", flush=True)
 
     try:
         yield
     finally:
         # Cleanup
-        logger.info("Shutting down...")
+        print("=== SHUTTING DOWN ===", flush=True)
         scheduler.shutdown()
         await close_db()
         await bot.session.close()
-        logger.info("Shutdown complete")
+        print("=== SHUTDOWN COMPLETE ===", flush=True)
 
 
 async def collect_business_income_job(session_maker, bot: Bot):
@@ -171,7 +174,7 @@ async def distribute_clan_income_job(session_maker):
 async def main():
     """Main entry point."""
     async with lifespan():
-        logger.info("Starting polling...")
+        print("=== STARTING POLLING ===", flush=True)
         # Start polling
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
