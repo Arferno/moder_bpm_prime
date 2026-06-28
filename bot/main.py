@@ -1,7 +1,9 @@
 import asyncio
 import logging
 import sys
-from contextlib import asynccontextmanager
+
+# IMMEDIATE STARTUP LOG - will show regardless of log level
+print("=== BOT STARTING ===", flush=True)
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -9,10 +11,16 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from bot.config import settings
+print(f"=== CONFIG LOADED: {settings.bot_token[:10]}... ===", flush=True)
+
 from bot.database.connection import init_db, close_db, async_session_maker
+print("=== DB MODULE LOADED ===", flush=True)
+
 from bot.middlewares.registration import RegistrationMiddleware
 from bot.middlewares.blacklist import BlacklistMiddleware
 from bot.middlewares.throttle import ThrottlingMiddleware
+print("=== MIDDLEWARES LOADED ===", flush=True)
+
 from bot.handlers import (
     moderation,
     profile,
@@ -29,6 +37,8 @@ from bot.handlers.farming import (
 from bot.services.moderation_service import check_and_unmute_expired
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+print("=== HANDLERS LOADED ===", flush=True)
+
 
 # Configure logging
 logging.basicConfig(
@@ -37,6 +47,8 @@ logging.basicConfig(
     stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
+
+print("=== LOGGING CONFIGURED ===", flush=True)
 
 
 # Global bot instance
@@ -50,17 +62,21 @@ async def lifespan():
     """Application lifespan handler."""
     global bot, dp, scheduler
 
+    print("=== LIFESPAN START ===", flush=True)
+    
     # Initialize database
-    logger.info("Initializing database...")
+    print("=== INIT DB START ===", flush=True)
     await init_db()
-    logger.info("Database initialized")
+    print("=== INIT DB DONE ===", flush=True)
 
     # Create bot and dispatcher
+    print("=== CREATING BOT ===", flush=True)
     bot = Bot(
         token=settings.bot_token,
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
     dp = Dispatcher(storage=MemoryStorage())
+    print("=== BOT CREATED ===", flush=True)
 
     # Register middlewares (order matters!)
     dp.message.middleware(RegistrationMiddleware())
@@ -68,6 +84,7 @@ async def lifespan():
     dp.message.middleware(BlacklistMiddleware())
     dp.callback_query.middleware(RegistrationMiddleware())
     dp.callback_query.middleware(ThrottlingMiddleware())
+    print("=== MIDDLEWARES REGISTERED ===", flush=True)
 
     # Register routers
     dp.include_router(moderation.router)
@@ -79,10 +96,11 @@ async def lifespan():
     dp.include_router(profile.router)
     dp.include_router(shop.router)
     dp.include_router(admin.router)
+    print("=== ROUTERS REGISTERED ===", flush=True)
 
     # Delete webhook if exists (important for polling)
     await bot.delete_webhook(drop_pending_updates=True)
-    logger.info("Webhook deleted, starting polling...")
+    print("=== WEBHOOK DELETED ===", flush=True)
 
     # Start scheduler for periodic tasks
     scheduler = AsyncIOScheduler()
@@ -94,7 +112,6 @@ async def lifespan():
         id="check_unmute",
         replace_existing=True,
     )
-    scheduler.add_job(
         collect_business_income_job,
         "interval",
         hours=1,

@@ -16,6 +16,8 @@ engine = create_async_engine(
     pool_pre_ping=True,
 )
 
+print(f"=== ENGINE CREATED: {settings.database_url[:50]}... ===", flush=True)
+
 async_session_maker = async_sessionmaker(
     engine,
     class_=AsyncSession,
@@ -32,26 +34,31 @@ async def get_session() -> AsyncSession:
 async def init_db() -> None:
     from bot.database.models import Base
     
+    print("=== INIT_DB: Starting database initialization ===", flush=True)
+    print(f"=== INIT_DB: Database URL: {settings.database_url[:50]}... ===", flush=True)
+    
     # Retry logic for database connection
     max_retries = 10
     base_delay = 2  # seconds
     
     for attempt in range(1, max_retries + 1):
         try:
+            print(f"=== INIT_DB: Attempt {attempt}/{max_retries} ===", flush=True)
             async with engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
-            logger.info("Database initialized successfully")
+            print("=== INIT_DB: Database initialized successfully ===", flush=True)
             return
         except OperationalError as e:
+            print(f"=== INIT_DB: Attempt {attempt} failed: {e} ===", flush=True)
             if attempt == max_retries:
-                logger.error(f"Failed to connect to database after {max_retries} attempts: {e}")
+                print(f"=== INIT_DB: Failed after {max_retries} attempts ===", flush=True)
                 raise
             
-            delay = base_delay * (2 ** (attempt - 1))  # exponential backoff: 2, 4, 8, 16...
-            logger.warning(f"Database connection attempt {attempt}/{max_retries} failed: {e}. Retrying in {delay}s...")
+            delay = base_delay * (2 ** (attempt - 1))
+            print(f"=== INIT_DB: Retrying in {delay}s... ===", flush=True)
             await asyncio.sleep(delay)
         except Exception as e:
-            logger.error(f"Unexpected error during database initialization: {e}")
+            print(f"=== INIT_DB: Unexpected error: {e} ===", flush=True)
             raise
 
 
