@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     database_url: str = Field(..., alias="DATABASE_URL")
     admin_ids_str: str = Field(default="", alias="ADMIN_IDS")
     super_admin_id: int = Field(..., alias="SUPER_ADMIN_ID")
-    log_level: str = Field(default="INFO", alias="LOG_LEVEL")
+    log_level: str = Field(default="WARNING", alias="LOG_LEVEL")
 
     # Farming settings
     daily_base_reward: int = Field(default=100, alias="DAILY_BASE_REWARD")
