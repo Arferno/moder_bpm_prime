@@ -286,6 +286,38 @@ async def get_available_jobs(session: AsyncSession, user_level: int) -> Sequence
     return result.scalars().all()
 
 
+async def get_user_job_cooldown(session: AsyncSession, user_id: int, job_id: int) -> Optional[int]:
+    """Returns remaining cooldown seconds or None if not on cooldown."""
+    from bot.database.models import User
+    result = await session.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user or not user.last_work:
+        return None
+    from datetime import datetime, timedelta
+    job = await get_job(session, job_id)
+    if not job:
+        return None
+    elapsed = (datetime.utcnow() - user.last_work).total_seconds()
+    remaining = job.cooldown_sec - int(elapsed)
+    return max(0, remaining) if remaining > 0 else None
+
+
+async def get_user_crime_cooldown(session: AsyncSession, user_id: int, crime_id: int) -> Optional[int]:
+    """Returns remaining cooldown seconds or None if not on cooldown."""
+    from bot.database.models import User
+    result = await session.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user or not user.last_crime:
+        return None
+    from datetime import datetime
+    crime = await get_crime(session, crime_id)
+    if not crime:
+        return None
+    elapsed = (datetime.utcnow() - user.last_crime).total_seconds()
+    remaining = crime.cooldown_sec - int(elapsed)
+    return max(0, remaining) if remaining > 0 else None
+
+
 # ==================== CRIMES ====================
 
 async def get_crime(session: AsyncSession, crime_id: int) -> Optional[Crime]:
