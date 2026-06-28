@@ -80,6 +80,10 @@ async def lifespan():
     dp.include_router(shop.router)
     dp.include_router(admin.router)
 
+    # Delete webhook if exists (important for polling)
+    await bot.delete_webhook(drop_pending_updates=True)
+    logger.info("Webhook deleted, starting polling...")
+
     # Start scheduler for periodic tasks
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
@@ -150,6 +154,7 @@ async def distribute_clan_income_job(session_maker):
 async def main():
     """Main entry point."""
     async with lifespan():
+        logger.info("Starting polling...")
         # Start polling
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
