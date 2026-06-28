@@ -18,6 +18,7 @@ from bot.database.connection import init_db, close_db, async_session_maker
 print("=== DB MODULE LOADED ===", flush=True)
 
 from bot.middlewares.registration import RegistrationMiddleware
+from bot.middlewares.database import DatabaseMiddleware
 from bot.middlewares.blacklist import BlacklistMiddleware
 from bot.middlewares.throttle import ThrottlingMiddleware
 print("=== MIDDLEWARES LOADED ===", flush=True)
@@ -80,9 +81,11 @@ async def lifespan():
     print("=== BOT CREATED ===", flush=True)
 
     # Register middlewares (order matters!)
+    dp.message.middleware(DatabaseMiddleware(async_session_maker))
     dp.message.middleware(RegistrationMiddleware())
     dp.message.middleware(ThrottlingMiddleware())
     dp.message.middleware(BlacklistMiddleware())
+    dp.callback_query.middleware(DatabaseMiddleware(async_session_maker))
     dp.callback_query.middleware(RegistrationMiddleware())
     dp.callback_query.middleware(ThrottlingMiddleware())
     print("=== MIDDLEWARES REGISTERED ===", flush=True)
