@@ -11,7 +11,7 @@ from bot.utils.formatting import format_money, format_profile
 from bot.filters.chat_type import PrivateFilter
 from bot.filters.is_admin import IsAdminFilter, IsSuperAdminFilter
 from bot.keyboards.reply import main_menu_keyboard, admin_keyboard
-from bot.utils.helpers import get_level_progress as helpers_get_level_progress
+from bot.utils.helpers import get_exp_for_next_level
 from bot.utils.formatting import format_number
 
 
