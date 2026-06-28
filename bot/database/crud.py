@@ -127,7 +127,7 @@ async def get_user_by_id(session: AsyncSession, user_id: int) -> Optional[User]:
             selectinload(User.clan),
             selectinload(User.clan_membership),
         )
-        .where(User.id == user_id)
+        .where(User.tg_id == user_id)
     )
     return result.scalar_one_or_none()
 

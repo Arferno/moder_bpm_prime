@@ -214,10 +214,10 @@ async def cmd_blacklist(message: Message, session: AsyncSession, command: Comman
         await message.reply(
             "📝 <b>Черный список</b>\n\n"
             "Команды:\n"
-            "• <code>/blacklist add <слово> [действие] [время]</code> — добавить\n"
-            "• <code>/blacklist del <слово></code> — удалить\n"
+            "• <code>/blacklist add слово [действие] [время]</code> — добавить\n"
+            "• <code>/blacklist del слово</code> — удалить\n"
             "• <code>/blacklist list</code> — список\n"
-            "• <code>/blacklist toggle <слово></code> — вкл/выкл\n\n"
+            "• <code>/blacklist toggle слово</code> — вкл/выкл\n\n"
             "Действия: warn (по умолчанию), mute, ban, delete\n"
             "Время: 10m, 1h, 1d (для mute/ban)",
             parse_mode="HTML",
@@ -228,7 +228,7 @@ async def cmd_blacklist(message: Message, session: AsyncSession, command: Comman
 
     if action == "add":
         if len(args) < 2:
-            await message.reply("❌ Укажи слово: /blacklist add <слово> [действие] [время]")
+            await message.reply("❌ Укажи слово: /blacklist add слово [действие] [время]")
             return
 
         word = args[1]
@@ -267,7 +267,7 @@ async def cmd_blacklist(message: Message, session: AsyncSession, command: Comman
 
     elif action == "del":
         if len(args) < 2:
-            await message.reply("❌ Укажи слово: /blacklist del <слово>")
+            await message.reply("❌ Укажи слово: /blacklist del слово")
             return
 
         word = args[1]
@@ -295,7 +295,7 @@ async def cmd_blacklist(message: Message, session: AsyncSession, command: Comman
 
     elif action == "toggle":
         if len(args) < 2:
-            await message.reply("❌ Укажи слово: /blacklist toggle <слово>")
+            await message.reply("❌ Укажи слово: /blacklist toggle слово")
             return
 
         word = args[1]
