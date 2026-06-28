@@ -15,6 +15,11 @@ from bot.utils.helpers import get_exp_for_next_level
 from bot.utils.formatting import format_number
 
 
+class MockCommandObject:
+    def __init__(self, args: str = ""):
+        self.args = args
+
+
 router = Router(name="text_commands")
 
 
@@ -31,7 +36,7 @@ async def text_balance(message: Message, session: AsyncSession):
 
 @router.message(F.text == "📊 Топ", PrivateFilter)
 async def text_top(message: Message, session: AsyncSession):
-    await profile_module.cmd_top(message, session, CommandObject(args="money"))
+    await profile_module.cmd_top(message, session, MockCommandObject(args="money"))
 
 
 @router.message(F.text == "🎁 Ежедневка", PrivateFilter)
@@ -56,12 +61,12 @@ async def text_business(message: Message, session: AsyncSession):
 
 @router.message(F.text == "🏰 Клан", PrivateFilter)
 async def text_clan(message: Message, session: AsyncSession):
-    await clan_module.cmd_clan(message, session, CommandObject(args=""))
+    await clan_module.cmd_clan(message, session, MockCommandObject(args=""))
 
 
 @router.message(F.text == "🛒 Магазин", PrivateFilter)
 async def text_shop(message: Message, session: AsyncSession):
-    await shop_module.cmd_shop(message, session, CommandObject(args=""))
+    await shop_module.cmd_shop(message, session, MockCommandObject(args=""))
 
 
 @router.message(F.text == "🎒 Инвентарь", PrivateFilter)
