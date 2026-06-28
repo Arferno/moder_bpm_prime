@@ -201,7 +201,7 @@ async def cb_inv_use(callback: CallbackQuery, session: AsyncSession):
         user.mute_until = None
         msg += f"🔊 Мут снят!\n"
 
-    from bot.services.farming_service import check_level_up
+    from bot.utils.helpers import check_level_up
     check_level_up(user)
 
     await session.flush()

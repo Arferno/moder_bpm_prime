@@ -196,7 +196,7 @@ async def cmd_give(message: Message, session: AsyncSession, command: CommandObje
         await message.reply(f"✅ Выдано {format_money(amount)}$ пользователю {user.full_name}")
     elif resource == "exp":
         user.exp += amount
-        from bot.services.farming_service import check_level_up
+        from bot.utils.helpers import check_level_up
         check_level_up(user)
         await message.reply(f"✅ Выдано {amount} XP пользователю {user.full_name}")
     else:

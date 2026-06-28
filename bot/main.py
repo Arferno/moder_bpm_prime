@@ -26,7 +26,7 @@ from bot.handlers.farming import (
     business,
     clan,
 )
-from bot.utils.helpers import check_and_unmute_expired
+from bot.services.moderation_service import check_and_unmute_expired
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 

@@ -57,13 +57,13 @@ def pluralize(count: int, forms: tuple[str, str, str]) -> str:
 
 def format_profile(user) -> str:
     """Formats user profile message."""
-    from bot.utils.text import format_money
+    from bot.utils.formatting import format_money
 
     job_name = user.job.name if user.job else "Безработный"
     clan_name = f"[{user.clan.tag}] {user.clan.name}" if user.clan else "Нет клана"
 
     # Progress bar for level
-    from bot.services.farming_service import get_exp_for_next_level
+    from bot.utils.helpers import get_exp_for_next_level
     current_level_exp = get_exp_for_next_level(user.level - 1) if user.level > 1 else 0
     next_level_exp = get_exp_for_next_level(user.level)
     progress = user.exp - current_level_exp
