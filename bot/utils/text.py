@@ -27,8 +27,8 @@ def normalize_for_blacklist(text: str) -> str:
     """
     # Remove all separators between characters
     cleaned = SEPARATORS_PATTERN.sub("", text)
-    # Keep only letters and numbers (Unicode-aware: \p{L} = any letter, \p{N} = any number)
-    normalized = re.sub(r"[^\p{L}\p{N}]", "", cleaned, flags=re.UNICODE)
+    # Keep only letters and numbers (works with standard re module)
+    normalized = re.sub(r"[^a-zA-Z0-9а-яА-ЯёЁ]", "", cleaned)
     return normalized.lower()
 
 
