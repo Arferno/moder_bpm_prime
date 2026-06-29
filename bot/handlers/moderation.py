@@ -209,15 +209,15 @@ async def cmd_blacklist(message: Message, session: AsyncSession, command: Comman
     """Blacklist management: /blacklist add|del|list|toggle <word> [action] [time]"""
     args = command.args.split() if command.args else []
 
-    if not args:
+if not args:
         # Show menu
         await message.reply(
             "📝 <b>Черный список</b>\n\n"
             "Команды:\n"
-            "• <code>/blacklist add слово [действие] [время]</code> — добавить\n"
-            "• <code>/blacklist del слово</code> — удалить\n"
+            "• <code>/blacklist add <слово> [действие] [время]</code> — добавить\n"
+            "• <code>/blacklist del <слово></code> — удалить\n"
             "• <code>/blacklist list</code> — список\n"
-            "• <code>/blacklist toggle слово</code> — вкл/выкл\n\n"
+            "• <code>/blacklist toggle <слово></code> — вкл/выкл\n\n"
             "Действия: warn (по умолчанию), mute, ban, delete\n"
             "Время: 10m, 1h, 1d (для mute/ban)",
             parse_mode="HTML",
@@ -316,7 +316,7 @@ async def cmd_blacklist(message: Message, session: AsyncSession, command: Comman
 async def cb_bl_add(callback: CallbackQuery):
     await callback.message.edit_text(
         "📝 Введи слово для добавления в ЧС:\n"
-        "Формат: <code>слово действие время</code>\n"
+        "Формат: <code><слово> <действие> <время></code>\n"
         "Пример: <code>мат warn</code> или <code>реклама mute 1h</code>",
         parse_mode="HTML",
     )
